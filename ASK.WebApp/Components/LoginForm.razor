@@ -55,6 +55,7 @@
 		{
 			LoginRequest request = new LoginRequest()
 				{
+					Type="Email",
 					Email = model.Email,
 					Password = model.Password
 				};
@@ -95,4 +96,7 @@
 		[Required]
 		public string Password { get; set; } = string.Empty;
 	}
+
+	
+
 }
