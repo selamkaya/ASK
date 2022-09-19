@@ -78,4 +78,6 @@ app.UseFastEndpoints(c =>
 app.UseOpenApi();
 app.UseSwaggerUi3(s => s.ConfigureDefaults());
 app.UseDefaultExceptionHandler();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.Run();
