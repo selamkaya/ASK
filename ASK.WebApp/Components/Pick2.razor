@@ -1,0 +1,144 @@
+﻿@using Microsoft.Extensions.Options
+@using ASK.Shared.Models
+@using ASK.Shared.Models.Job
+@inject IOptions<AppSettings> _appSettings
+
+<h3>Pick 2</h3>
+
+<div class="card border m-lg-0">
+	<div class="card-body">
+		<span class="badge border border-danger text-danger fa-pull-right root-text-lg">@Job.Id</span>
+		<h3>@Job.Name </h3>
+		<p class="card-text">
+
+			Shipments: <span class="badge border border-danger text-danger root-text-lg">@Job.Shipments</span>
+			Products: <span class="badge border border-danger text-danger root-text-lg">@Job.Products</span>
+		</p>
+	</div>
+	@*	<ul class="list-group list-group-flush">
+	<li class="list-group-item">
+	<div class="alert alert-warning" role="alert">
+	Please put <strong>@Job.Shipments</strong> bins on picking car and scan them one by one.
+	</div>
+
+	</li>
+	</ul>*@
+	<div class="card-body">
+
+		@if (_showScanForm)
+		{
+			<div class="alert alert-warning">
+				Scan bin @(_binIndex + 1) of @Job.Shipments
+			</div>
+			<div class="row">
+				<EditForm Model="@_binScanModel" OnSubmit="@ScanBin" class="input-group col">
+					<InputTextWithFocus @bind-Value="@_binScanModel.Code" class="form-control" />
+					<ValidationMessage For="() => _binScanModel.Code" />
+					<button type="submit" class="btn btn-primary">Enter</button>
+				</EditForm>
+			</div>
+		}
+		<br />
+		@foreach (var item in _binList)
+		{
+			<div>Scanned: @item</div>
+		}
+		<br />
+
+		<button @onclick="GoBack" class="btn btn-danger">Back</button>
+		<button @onclick="StartOver" class="btn btn-secondary">Reset</button>
+		@if (!_showScanForm)
+		{
+			<button @onclick="GoNext" class="btn btn-primary fa-pull-right">Start</button>
+		}
+	</div>
+</div>
+
+<p>
+	<Messages MessageList="@_messages"></Messages>
+</p>
+
+
+@code {
+	[Parameter]
+	public EventCallback<KeyValuePair<int, JobModel>> OnPageChanged { get; set; }
+
+	[Parameter]
+	public JobModel Job { get; set; } = new();
+
+	protected int _pageIndex = 3;
+	protected int _binIndex = 0;
+	protected bool _showScanForm = true;
+	protected BinScanModel _binScanModel = new();
+	protected List<string> _binList = new();
+	protected List<string> _messages = new List<string>();
+
+	public async Task ScanBin(EditContext context)
+	{
+		if (context.Validate())
+		{
+			_binIndex += 1;
+			_binList.Add(_binScanModel.Code);
+
+			_binScanModel.Code = string.Empty;
+
+			if (_binIndex == Job.Shipments)
+			{
+				//hide scan form
+				_showScanForm = false;
+			}
+		}
+	}
+
+	public void GoBack()
+	{
+		WmsNavigationManager.NavigateTo("/job/pick", true);
+	}
+
+	public void StartOver()
+	{
+		_binIndex = 0;
+		_showScanForm = true;
+		_binList.Clear();
+		_messages.Clear();
+	}
+
+	public async Task GoNext()
+	{
+		try
+		{
+			//attach bins
+			var requestModel = new JobAttachRequest
+				{
+					JobId = Job.Id,
+					BinCodes = _binList
+				};
+
+			var apiUrl = _appSettings.Value.ApiUrl;
+			var response = await WmsHttpService.Post<JobAttachRequest, AppResult<JobAttachResponse>>($"{apiUrl}/job/attach", requestModel);
+			if (!response.Succeeded)
+			{
+				_messages = response.Messages;
+				return;
+			}
+
+			var responseModel = response.Data;
+			if (responseModel.Done)
+			{
+				KeyValuePair<int, JobModel> callBack = new KeyValuePair<int, JobModel>(3, Job);
+
+				await OnPageChanged.InvokeAsync(callBack);
+			}
+		}
+		catch (Exception e)
+		{
+			_messages = new List<string>() { e.Message };
+		}
+	}
+
+	public class BinScanModel
+	{
+		[Required]
+		public string Code { get; set; } = string.Empty;
+	}
+}

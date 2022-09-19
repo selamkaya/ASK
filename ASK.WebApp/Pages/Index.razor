@@ -1,0 +1,31 @@
+﻿@page "/"
+
+<PageTitle>Ultra App</PageTitle>
+
+<AuthorizeView>
+	<Authorized>
+		<button @onclick="Logout" class="nav-link btn btn-link">Log out</button>
+	</Authorized>
+	<NotAuthorized>
+		<RedirectToLogin />
+	</NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await WmsAuthStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+
+		if (user.Identity != null && user.Identity.IsAuthenticated)
+		{
+			WmsNavigationManager.NavigateTo("/dashboard");
+		}
+	}
+
+	public void Logout()
+	{
+		WmsNavigationManager.NavigateTo("/account/logout");
+	}
+}

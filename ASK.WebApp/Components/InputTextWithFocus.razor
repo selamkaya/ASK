@@ -1,0 +1,19 @@
+﻿@inherits InputText
+
+<input @ref="inputElement"
+			 @attributes="AdditionalAttributes"
+			 class="form-control" 
+			 inputmode="none"
+			 placeholder="Search"
+			 value="@CurrentValue" />
+
+@code {
+	private ElementReference inputElement;
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		inputElement.FocusAsync();
+
+		base.OnInitialized();
+	}
+}

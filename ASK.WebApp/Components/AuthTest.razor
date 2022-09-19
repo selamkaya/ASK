@@ -1,0 +1,73 @@
+﻿@using System.Security.Claims
+@*<h3>Auth: @HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated - @HttpContextAccessor.HttpContext.User.Identity.Name </h3>*@
+<h6>Auth: @Username/@IsAuth/@IsAdmin/</h6>
+
+<h6>
+	Roles Admin:
+	<AuthorizeView Roles="Admin">
+		OK
+	</AuthorizeView>
+</h6>
+<h6>
+	Policy IsAdmin
+	<AuthorizeView Policy="IsAdmin">
+		OK
+	</AuthorizeView>
+</h6>
+<AuthorizeView>
+	<Authorized>
+		<div class="alert alert-info">User is Authorized (@Username)</div>
+	</Authorized>
+	<NotAuthorized>
+		<div class="alert alert-danger">User is NOT Authorized</div>
+	</NotAuthorized>
+</AuthorizeView>
+
+<p>Authenticated: @_user?.Identity?.IsAuthenticated</p>
+<p>Role: @_user.IsInRole("Intern")</p>
+
+@if (_user.Claims.Count() > 0)
+{
+	<ul>
+		@foreach (var claim in _user.Claims)
+		{
+			<li>@claim.Type: @claim.Value</li>
+		}
+	</ul>
+}
+
+@code {
+	ClaimsPrincipal _user = new ClaimsPrincipal();
+
+	public string Username { get; set; }
+	public bool IsAuth { get; set; }
+	public bool IsAdmin { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		var state = await WmsAuthStateProvider.GetAuthenticationStateAsync();
+
+		_user = state.User;
+
+		Username = state.User.GetLoggedInUserName();
+		IsAuth = state.User.Identity.IsAuthenticated;
+		IsAdmin = state.User.IsInRole("Admin");
+
+		await base.OnInitializedAsync();
+	}
+
+	//protected override async Task OnAfterRenderAsync(bool firstRender)
+	//{
+	//	if (firstRender)
+	//	{
+	//		var _customAuthStateProvider = new CustomAuthStateProvider(_storageService);
+
+	//		var state = await _customAuthStateProvider.GetAuthenticationStateAsync();
+
+	//		Ok = state.User.Identity.IsAuthenticated;
+	//		Username = state.User.GetLoggedInUserName();
+
+	//		StateHasChanged();
+	//	}
+		//}
+}

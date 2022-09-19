@@ -1,0 +1,17 @@
+﻿@page "/account/logout/"
+@attribute [AllowAnonymous]
+
+@code
+{
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await WmsStorageService.RemoveItem(Constants.TokenName);
+
+		var state = await WmsAuthStateProvider.GetAuthenticationStateAsync();
+
+		WmsNavigationManager.NavigateTo("/account/login", true);
+	}
+
+}

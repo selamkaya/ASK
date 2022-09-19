@@ -1,0 +1,64 @@
+﻿@inherits InputText
+
+<div class="row">
+	<div class="form-group">
+
+		<EditForm OnSubmit="@OnSubmit" class="input-group col">
+
+			<input @ref="scanBox"
+						 @attributes="AdditionalAttributes"
+						 class="form-control"
+						 inputmode="none"
+						 placeholder="Search"
+						 value="@model.Code"
+						 @oninput="EventCallback.Factory.CreateBinder<string>(this, __value => CurrentValueAsString = __value, CurrentValueAsString)" />
+
+			@*<ValidationMessage For="() => model.Code" />*@
+
+			<button type="submit" class="btn btn-primary">Search</button>
+		</EditForm>
+	</div>
+</div>
+<p>
+	Scanned: @Code
+</p>
+
+@code {
+
+	[Parameter]
+	public EventCallback<string> OnScan { get; set; }
+
+	protected ElementReference scanBox;
+	protected string Code = string.Empty;
+
+	protected ScanModel model { get; set; } = new();
+	//protected EditContext editContext { get; set; } = null!;
+
+	//protected override void OnInitialized()
+	//{
+	//	editContext = new EditContext(model);
+	//}
+
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		scanBox.FocusAsync();
+
+		base.OnInitialized();
+	}
+
+	private async Task OnSubmit()
+	{
+		//if (context.Validate())
+		//{
+			await OnScan.InvokeAsync(Code);
+		//}
+
+		Code = string.Empty;
+	}
+
+	public class ScanModel
+	{
+		public string Code { get; set; } = string.Empty;
+	}
+}

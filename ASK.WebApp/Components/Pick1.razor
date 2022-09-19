@@ -1,0 +1,83 @@
+﻿@using Microsoft.Extensions.Options
+@using ASK.Shared.Models
+@using ASK.Shared.Models.Job
+@inject IOptions<AppSettings> _appSettings
+
+<h3>Pick 1</h3>
+
+<p>
+	<Messages MessageList="@_messages"></Messages>
+</p>
+
+@foreach (var job in _responseModel.Jobs)
+{
+	<div class="card border m-lg-0">
+		<div class="card-body">
+			<span class="badge border border-danger text-danger fa-pull-right root-text-lg">@job.Id</span>
+			<h3>@job.Name </h3>
+			<p class="card-text">
+
+				Priority: @job.Priority
+				<br />
+				Shipments: @job.Shipments
+				<br />
+				Products: @job.Products
+				<br />
+				B2B Orders: @job.B2bOrders
+				<br />
+				High Prio Orders: @job.HighPrios
+				<br />
+				Marketplace Orders : @job.MarketPlaceOrders
+
+			</p>
+		</div>
+		<div class="card-body">
+			<a href="" @onclick="() => GoNext(job.Id)" @onclick:preventDefault class="btn btn-sm btn-primary waves-effect waves-themed fa-pull-right">Take Job</a>
+		</div>
+	</div>
+	<p><br/></p>
+}
+
+@code {
+
+	[Parameter]
+	public EventCallback<KeyValuePair<int, JobModel>> OnPageChanged { get; set; }
+
+	protected JobListRequest _requestModel = new();
+	protected JobListResponse _responseModel = new();
+	protected List<string> _messages = new List<string>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await GetJobs();
+		await base.OnInitializedAsync();
+	}
+
+	public async Task GetJobs()
+	{
+		var apiUrl = _appSettings.Value.ApiUrl;
+		var response = await WmsHttpService.Post<JobListRequest, AppResult<JobListResponse>>($"{apiUrl}/job/list", _requestModel);
+		if (!response.Succeeded)
+		{
+			_messages = response.Messages;
+			_responseModel.Jobs = new List<JobModel>();
+			//requestModel.Code = string.Empty;
+			return;
+		}
+
+		_responseModel = response.Data;
+		if (_responseModel.Jobs == null || _responseModel.Jobs.Count == 0)
+			_messages = new List<string>() { "No items found!" };
+
+	}
+
+	protected async Task GoNext(int jobId)
+	{
+		var job = _responseModel.Jobs.Where(x => x.Id == jobId).FirstOrDefault();
+
+		KeyValuePair<int, JobModel> callBack = new KeyValuePair<int, JobModel>(2, job);
+
+		await OnPageChanged.InvokeAsync(callBack);
+	}
+
+}

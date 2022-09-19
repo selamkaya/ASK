@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FastEndpoints" Version="5.1.0" />
+    <PackageReference Include="FastEndpoints.Security" Version="5.1.0" />
+    <PackageReference Include="FastEndpoints.Swagger" Version="5.1.0" />
+    <PackageReference Include="Wms.BlobStorage" Version="1.0.0" />
+    <PackageReference Include="Wms.Domain" Version="1.0.1" />
+    <PackageReference Include="Wms.Domain.Net6" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ASK.Core\ASK.Core.csproj" />
+    <ProjectReference Include="..\ASK.Shared\ASK.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

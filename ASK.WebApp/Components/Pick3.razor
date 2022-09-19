@@ -1,0 +1,94 @@
+﻿@using Microsoft.Extensions.Options
+@using ASK.Shared.Models
+@using ASK.Shared.Models.Job
+@inject IOptions<AppSettings> _appSettings
+
+<h3>Pick 3</h3>
+
+<p>
+	<Messages MessageList="@_messages"></Messages>
+</p>
+
+@*
+<div class="card border m-lg-0">
+	<div class="card-body">
+		<span class="badge border border-danger text-danger fa-pull-right root-text-lg">@job.Id</span>
+		<h3>@job.Name </h3>
+		<p class="card-text">
+
+			Priority: @job.Priority
+			<br />
+			Shipments: @job.Shipments
+			<br />
+			Products: @job.Products
+			<br />
+			B2B Orders: @job.B2bOrders
+			<br />
+			High Prio Orders: @job.HighPrios
+			<br />
+			Marketplace Orders : @job.MarketPlaceOrders
+
+		</p>
+	</div>
+	<div class="card-body">
+		<a href="" @onclick="() => GoNext(job.Id)" @onclick:preventDefault class="btn btn-sm btn-primary waves-effect waves-themed fa-pull-right">Take Job</a>
+	</div>
+</div>
+
+<button @onclick="GoNext">Send</button>*@
+
+@code {
+
+	[Parameter]
+	public EventCallback<KeyValuePair<int, JobModel>> OnPageChanged { get; set; }
+
+	[Parameter]
+	public JobModel Job { get; set; } = new();
+
+	protected JobPickListResponse _responseModel = new();
+	protected List<string> _messages = new List<string>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await GetTaskList();
+		await base.OnInitializedAsync();
+	}
+
+	public async Task GetTaskList()
+	{
+		try
+		{
+			var request = new JobPickListRequest
+				{
+					JobId = Job.Id,
+				};
+
+			var apiUrl = _appSettings.Value.ApiUrl;
+			var response = await WmsHttpService.Post<JobPickListRequest, AppResult<JobPickListResponse>>($"{apiUrl}/job/picklist", request);
+			if (!response.Succeeded)
+			{
+				_messages = response.Messages;
+				return;
+			}
+
+			_responseModel = response.Data;
+			//if (_responseModel.PickList.Any())
+			//{
+			//	//KeyValuePair<int, JobModel> callBack = new KeyValuePair<int, JobModel>(3, Job);
+
+			//	//await OnPageChanged.InvokeAsync(callBack);
+			//}
+		}
+		catch (Exception e)
+		{
+			_messages = new List<string>() { e.Message };
+		}
+	}
+
+	public async Task GoNext()
+	{
+		KeyValuePair<int, JobModel> callBack = new KeyValuePair<int, JobModel>(2, Job);
+
+		await OnPageChanged.InvokeAsync(callBack);
+	}
+}

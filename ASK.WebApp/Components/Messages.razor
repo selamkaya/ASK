@@ -1,0 +1,18 @@
+﻿@if (MessageList.Any())
+{
+	<br />
+	<div class="alert alert-@ToastMessageType">
+		@foreach (var message in MessageList)
+		{
+			<div>- @message</div>
+		}
+	</div>
+}
+
+@code {
+	[Parameter]
+	public List<string> MessageList { get; set; } = new();
+
+	[Parameter]
+	public string ToastMessageType { get; set; } = "warning";
+}

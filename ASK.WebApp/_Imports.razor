@@ -1,0 +1,41 @@
+﻿
+@attribute [Authorize(Roles = "Admin,Intern-Pick&Pack")]
+
+@using System.Net.Http
+@using System.ComponentModel.DataAnnotations
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+
+@using Microsoft.Extensions.Options
+@using Microsoft.JSInterop
+
+@using ASK.WebApp
+@using ASK.WebApp.Helpers
+@using ASK.WebApp.Shared
+@using ASK.WebApp.Components
+
+@using ASK.Shared.Models
+@using ASK.Shared.Models.Job
+@using ASK.Shared.Models.Location
+@using ASK.Shared.Interfaces
+
+@using AntDesign
+
+@inject IConfiguration WmsConfiguration
+@inject IOptions<AppSettings> WmsAppSettings
+@inject IHttpContextAccessor WmsHttpContextAccessor
+@inject NavigationManager WmsNavigationManager
+
+@inject IWmsHttpService WmsHttpService
+@inject IWmsStorageService WmsStorageService;
+@inject WmsAuthStateProvider WmsAuthStateProvider
+@inject WmsAppState WmsAppState
+
+
+
+

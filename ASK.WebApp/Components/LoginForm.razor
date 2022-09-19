@@ -1,0 +1,98 @@
+﻿@attribute [AllowAnonymous]
+@using Microsoft.Extensions.Options
+@using ASK.Shared.Models.Account
+
+@inject IOptions<AppSettings> _appSettings
+@inject ILogger<LoginForm> _logger
+
+<div class="blankpage-form-field">
+	<div class="page-logo m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
+		<img src="/img/logo.png" alt="ULTRA WMS" aria-roledescription="logo">
+		<span class="page-logo-text mr-1">ULTRA WMS</span>
+		<i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
+	</div>
+	<div class="card p-4 border-top-left-radius-0 border-top-right-radius-0">
+
+		@if (messages.Any())
+		{
+			@foreach (var message in messages)
+			{
+				<div class="alert alert-danger">@message</div>
+			}
+		}
+		<EditForm OnSubmit="HandleSubmit" EditContext="editContext">
+			<DataAnnotationsValidator />
+			<ValidationSummary />
+
+			<div class="form-group">
+				<label for="@model.Email">Email</label>
+				<InputText id="model.Username" @bind-Value="model.Email" class="form-control" />
+			</div>
+			<div class="form-group">
+				<label for="@model.Password">Password</label>
+				<InputText id="@model.Password" @bind-Value="model.Password" class="form-control" type="password" />
+			</div>
+			<button type="submit" class="btn btn-primary">Login</button>
+
+		</EditForm>
+	</div>
+</div>
+
+@code
+{
+	protected LoginModel model = new();
+	protected EditContext editContext { get; set; } = null!;
+	protected List<string> messages = new List<string>();
+
+	protected override void OnInitialized()
+	{
+		editContext = new EditContext(model);
+	}
+
+	private async Task HandleSubmit(EditContext context)
+	{
+		if (context.Validate())
+		{
+			LoginRequest request = new LoginRequest()
+				{
+					Email = model.Email,
+					Password = model.Password
+				};
+
+
+			//var response = await _accountService.LoginAsync(request);
+			var apiUrl = _appSettings.Value.ApiUrl;
+			var response = await WmsHttpService.Login<LoginRequest, LoginResponse>($"{apiUrl}/account/login", request);
+			if (!response.Succeeded)
+			{
+				messages = response.Messages;
+				return;
+			}
+
+			if (string.IsNullOrEmpty(response.Data.Token))
+			{
+				return;
+			}
+
+			await WmsStorageService.SetItem(Constants.TokenName, response.Data.Token);
+			var state = await WmsAuthStateProvider.GetAuthenticationStateAsync();
+			WmsAppState.UserId = state.User.GetLoggedInUserId<int>();
+			WmsAppState.UserName = state.User.Identity.Name;
+
+			_logger.LogInformation($" User {WmsAppState.UserName} logged in!");
+
+			WmsNavigationManager.NavigateTo("/dashboard", true);
+		}
+	}
+
+
+	public class LoginModel
+	{
+		[Required]
+		[EmailAddress]
+		public string Email { get; set; } = string.Empty;
+
+		[Required]
+		public string Password { get; set; } = string.Empty;
+	}
+}

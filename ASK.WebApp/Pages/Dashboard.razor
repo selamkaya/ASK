@@ -1,0 +1,93 @@
+﻿@page "/dashboard"
+
+@attribute [Authorize]
+@inject ILogger<Dashboard> _logger
+
+<PageTitle>Dashboard</PageTitle>
+
+
+<ul class="app-list">
+	<li>
+		<a href="/product/info" class="app-list-item hover-white">
+			<span class="icon-stack">
+				<i class="base-5 icon-stack-3x color-success-700 opacity-80"></i>
+				<i class="base-12 icon-stack-2x color-success-700 opacity-30"></i>
+				<i class="fal fa-gift icon-stack-2x text-white"></i>
+			</span>
+			<span class="app-list-name">
+				Product Info
+			</span>
+		</a>
+	</li>
+	<li>
+		<a href="/location/info" class="app-list-item hover-white">
+			<span class="icon-stack">
+				<i class="base-5 icon-stack-3x color-warning-600"></i>
+				<i class="base-7 icon-stack-2x color-warning-800 opacity-50"></i>
+				<i class="fal fa-table icon-stack-2x text-white"></i>
+			</span>
+			<span class="app-list-name">
+				Location Info
+			</span>
+		</a>
+	</li>
+	<li>
+		<a href="/bin/info" class="app-list-item hover-white">
+			<span class="icon-stack">
+				<i class="base-5 icon-stack-3x color-danger-600"></i>
+				<i class="base-7 icon-stack-2x color-danger-800 opacity-50"></i>
+				<i class="fal fa-box icon-stack-2x text-white"></i>
+			</span>
+			<span class="app-list-name">
+				Bin Info
+			</span>
+		</a>
+	</li>
+@*	<li>
+		<a href="/product/transfer" class="app-list-item hover-white">
+			<span class="icon-stack">
+				<i class="base-5 icon-stack-3x color-success-700 opacity-80"></i>
+				<i class="base-12 icon-stack-2x color-success-700 opacity-30"></i>
+				<i class="fal fa-gift icon-stack-2x text-white"></i>
+			</span>
+			<span class="app-list-name">
+				Product Transfer
+			</span>
+		</a>
+	</li>*@
+	<li>
+		<a href="/stock/transfer" class="app-list-item hover-white">
+			<span class="icon-stack">
+				<i class="base-5 icon-stack-3x color-warning-600"></i>
+				<i class="base-7 icon-stack-2x color-warning-800 opacity-50"></i>
+				<i class="fal fa-table icon-stack-2x text-white"></i>
+			</span>
+			<span class="app-list-name">
+				Stock Transfer
+			</span>
+		</a>
+	</li>
+	<li>
+		<a href="/job/pick1" class="app-list-item hover-white">
+			<span class="icon-stack">
+				<i class="base-5 icon-stack-3x color-danger-600"></i>
+				<i class="base-7 icon-stack-2x color-danger-800 opacity-50"></i>
+				<i class="fal fa-box icon-stack-2x text-white"></i>
+			</span>
+			<span class="app-list-name">
+				Job Picking
+			</span>
+		</a>
+	</li>
+@*	<li class="w-100">
+		<a href="#" class="btn btn-default mt-4 mb-2 pr-5 pl-5"> Add more apps </a>
+	</li>*@
+</ul>
+
+@code
+{
+	protected override async Task OnInitializedAsync()
+	{
+		_logger.LogInformation($"{nameof(Dashboard)} - {WmsAppState.UserName}");
+	}
+}
