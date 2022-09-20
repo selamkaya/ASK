@@ -7,8 +7,8 @@
 
 <div class="blankpage-form-field">
 	<div class="page-logo m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
-		<img src="/img/logo.png" alt="ULTRA WMS" aria-roledescription="logo">
-		<span class="page-logo-text mr-1">ULTRA WMS</span>
+		<img src="/img/logo.png" alt="AsK test" aria-roledescription="logo">
+		<span class="page-logo-text mr-1">AsK test</span>
 		<i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
 	</div>
 	<div class="card p-4 border-top-left-radius-0 border-top-right-radius-0">
@@ -62,7 +62,7 @@
 
 
 			//var response = await _accountService.LoginAsync(request);
-			var apiUrl = _appSettings.Value.ApiUrl;
+			var apiUrl = _appSettings.Value.IdentityApiUrl;
 			var response = await WmsHttpService.Login<LoginRequest, LoginResponse>($"{apiUrl}/account/login", request);
 			if (!response.Succeeded)
 			{
