@@ -453,10 +453,8 @@ public class AppService : IAppService
 
 	private bool MoveStock(StockTransferModel model)
 	{
-
 		try
 		{
-
 			//RULES
 			var stockRepo = _uow.Repository<Stock>();
 			var locationRepo = _uow.Repository<Location>();

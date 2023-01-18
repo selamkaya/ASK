@@ -59,11 +59,7 @@
 					Email = model.Email,
 					Password = model.Password
 				};
-
-
-			//var response = await _accountService.LoginAsync(request);
-			var apiUrl = _appSettings.Value.IdentityApiUrl;
-			var response = await WmsHttpService.Login<LoginRequest, LoginResponse>($"{apiUrl}/account/login", request);
+			var response = await WmsHttpService.Login<LoginRequest, LoginResponse>($"{_appSettings.Value.IdentityApiUrl}/account/login", request);
 			if (!response.Succeeded)
 			{
 				messages = response.Messages;
